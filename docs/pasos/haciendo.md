@@ -24,3 +24,9 @@ Por cada archivo quiero el nombre, el tamaño, la fecha y el tipo.
 Me encuentro que `/lista` estaba escrita dos veces, lo mismo que '/kill'. 
 Aprovecho y cambio `/lista` por `/menu`.
 
+## servir los headers correctos
+
+Poner el Content-Type en los headers. 
+
+Mirando como está, veo también que hay código Javascript metido dentro de strings,
+eso hay que cambiarlo por código typescript que esté donde tenga que estar. 
