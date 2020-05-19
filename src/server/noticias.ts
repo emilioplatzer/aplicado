@@ -3,6 +3,9 @@ import * as express from "express";
 import * as open from "open";
 import { Server } from "http";
 
+import { promises as fs } from "fs";
+import * as Path from "path";
+
 function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message?:string){
     return function(err?:Error|undefined){
         if(err){
@@ -18,6 +21,26 @@ function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message
 
 const entryPointMenu = 'menu';
 const entryPointKill = 'kill';
+const entryPointLista = 'lista';
+
+function quote(text:string){
+    return text.replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+const BotonCerrar=`
+    <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>
+    <script>
+        window.addEventListener("load", function(){
+            closeButton.addEventListener("click", function () {
+                navigator.sendBeacon('/${entryPointKill}',new Date().toString())
+                close();
+            });
+        });
+    </script>`;
+
 
 class EasyServer{
     private app=express();
@@ -26,19 +49,26 @@ class EasyServer{
     constructor(){
     }
     async startListening():Promise<void>{
-        this.app.get(`/${entryPointMenu}`, function(_req, res){
+        this.app.get(`/${entryPointMenu}`, (_req, res)=>{
             res.send(`
                 <h1>aplicado</h1>
-                <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>
-                <script>
-                    window.addEventListener("load", function(){
-                        closeButton.addEventListener("click", function () {
-                            navigator.sendBeacon('/${entryPointKill}',new Date().toString())
-                            close();
-                        });
-                    });
-                </script>
+                <p><a href="/${entryPointLista}">${entryPointLista}</a></p>
+                ${BotonCerrar}
             `);
+        });
+        this.app.get(`/${entryPointLista}`, async (_req, res)=>{
+            res.write(`<h1>files</h1><ul>`);
+            const basePath = 'fixtures/data';
+            var dir = await fs.opendir(basePath);
+            for await (const dirent of dir) {
+                if(dirent.isFile()){
+                    res.write(`<li>${quote(dirent.name)} `);
+                    const status = await fs.stat(Path.join(basePath,dirent.name));
+                    res.write(` ${quote(status.ctime.toLocaleDateString())}</li>`)
+                }
+            }
+            res.write(`</ul>${BotonCerrar}`);
+            res.end();
         });
         this.app.post(`/${entryPointKill}`, (_req, res)=>{
             res.send('killing...');
