@@ -24,9 +24,17 @@ class EasyServer{
     }
     async startListening():Promise<void>{
         this.app.get('/lista', function(_req, res){
-            res.send('<a href="/kill">Click</a> to stop the server');
-        })
-        this.app.get('/kill', (_req, res)=>{
+            res.send(`
+                <h1>aplicado</h1>
+                <p>Close the window to stop the server (and be patient).</p>
+                <script>
+                    window.addEventListener("unload", function () {
+                        navigator.sendBeacon('/kill',new Date().toString())
+                    });
+                </script>
+            `);
+        });
+        this.app.post('/kill', (_req, res)=>{
             res.send('killing...');
             console.log('recive kill')
             this.killed=true;
@@ -48,7 +56,7 @@ class EasyServer{
         })
     }
     async stopListening(){
-        console.log('closing...')
+        console.log('closing... (this may take a while)')
         return new Promise((resolve,reject)=>{
             if(!this.server){
                 return reject(new Error('server does not started yet'))
