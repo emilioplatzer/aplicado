@@ -19,3 +19,8 @@ Los datos van a ser unos archivos que voy a tirar en una carpeta /fixtures/data
 
 Por cada archivo quiero el nombre, el tamaño, la fecha y el tipo. 
 
+### refactoring
+
+Me encuentro que `/lista` estaba escrita dos veces, lo mismo que '/kill'. 
+Aprovecho y cambio `/lista` por `/menu`.
+

@@ -16,6 +16,9 @@ function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message
     }
 }
 
+const entryPointMenu = 'menu';
+const entryPointKill = 'kill';
+
 class EasyServer{
     private app=express();
     private server?:Server;
@@ -23,21 +26,21 @@ class EasyServer{
     constructor(){
     }
     async startListening():Promise<void>{
-        this.app.get('/lista', function(_req, res){
+        this.app.get(`/${entryPointMenu}`, function(_req, res){
             res.send(`
                 <h1>aplicado</h1>
                 <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>
                 <script>
                     window.addEventListener("load", function(){
                         closeButton.addEventListener("click", function () {
-                            navigator.sendBeacon('/kill',new Date().toString())
+                            navigator.sendBeacon('/${entryPointKill}',new Date().toString())
                             close();
                         });
                     });
                 </script>
             `);
         });
-        this.app.post('/kill', (_req, res)=>{
+        this.app.post(`/${entryPointKill}`, (_req, res)=>{
             res.send('killing...');
             console.log('recive kill')
             this.killed=true;
@@ -76,7 +79,7 @@ async function start(){
         console.log('platform',process.platform);
         const server = new EasyServer();
         await server.startListening();
-        open('http://localhost:3303/lista');
+        open(`http://localhost:3303/${entryPointMenu}`);
         await server.becomesKilled();
         await server.stopListening();
         console.log('end of all')
