@@ -47,8 +47,10 @@ class EasyServer{
     constructor(){
     }
     listenEntryPoint(entryPoint:entryPoints, core:(req:express.Request, res:express.Response)=>void, method:('get'|'post')='get'){
-        console.log('sirviendo', entryPoint, `/${entryPoints[entryPoint]}`)
-        this.app[method](`/${entryPoints[entryPoint]}`, core);
+        this.app[method](`/${entryPoints[entryPoint]}`, (req,res)=>{
+            res.contentType('html');
+            core(req,res)
+        });
     }
     async startListening():Promise<void>{
         this.listenEntryPoint(entryPoints.menu, (_req, res)=>{
