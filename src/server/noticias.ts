@@ -26,10 +26,13 @@ class EasyServer{
         this.app.get('/lista', function(_req, res){
             res.send(`
                 <h1>aplicado</h1>
-                <p>Close the window to stop the server (and be patient).</p>
+                <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>
                 <script>
-                    window.addEventListener("unload", function () {
-                        navigator.sendBeacon('/kill',new Date().toString())
+                    window.addEventListener("load", function(){
+                        closeButton.addEventListener("click", function () {
+                            navigator.sendBeacon('/kill',new Date().toString())
+                            close();
+                        });
                     });
                 </script>
             `);
