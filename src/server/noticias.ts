@@ -19,9 +19,7 @@ function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message
     }
 }
 
-const entryPointMenu = 'menu';
-const entryPointKill = 'kill';
-const entryPointLista = 'lista';
+enum entryPoints {menu, kill, lista};
 
 function quote(text:string){
     return text.replace(/&/g, '&amp;')
@@ -35,7 +33,7 @@ const BotonCerrar=`
     <script>
         window.addEventListener("load", function(){
             closeButton.addEventListener("click", function () {
-                navigator.sendBeacon('/${entryPointKill}',new Date().toString())
+                navigator.sendBeacon('/${entryPoints[entryPoints.kill]}',new Date().toString())
                 close();
             });
         });
@@ -48,15 +46,19 @@ class EasyServer{
     private killed?:true;
     constructor(){
     }
+    listenEntryPoint(entryPoint:entryPoints, core:(req:express.Request, res:express.Response)=>void, method:('get'|'post')='get'){
+        console.log('sirviendo', entryPoint, `/${entryPoints[entryPoint]}`)
+        this.app[method](`/${entryPoints[entryPoint]}`, core);
+    }
     async startListening():Promise<void>{
-        this.app.get(`/${entryPointMenu}`, (_req, res)=>{
+        this.listenEntryPoint(entryPoints.menu, (_req, res)=>{
             res.send(`
                 <h1>aplicado</h1>
-                <p><a href="/${entryPointLista}">${entryPointLista}</a></p>
+                <p><a href="/${entryPoints[entryPoints.lista]}">${entryPoints[entryPoints.lista]}</a></p>
                 ${BotonCerrar}
             `);
         });
-        this.app.get(`/${entryPointLista}`, async (_req, res)=>{
+        this.listenEntryPoint(entryPoints.lista, async (_req, res)=>{
             res.write(`<h1>files</h1><ul>`);
             const basePath = 'fixtures/data';
             var dir = await fs.opendir(basePath);
@@ -70,11 +72,11 @@ class EasyServer{
             res.write(`</ul>${BotonCerrar}`);
             res.end();
         });
-        this.app.post(`/${entryPointKill}`, (_req, res)=>{
+        this.listenEntryPoint(entryPoints.kill, (_req, res)=>{
             res.send('killing...');
             console.log('recive kill')
             this.killed=true;
-        })
+        }, 'post')
         return new Promise((resolve, reject)=>{
             console.log('start to listen')
             this.server = this.app.listen(3303, conclude(resolve, reject, 'listening'));
@@ -97,7 +99,7 @@ class EasyServer{
             if(!this.server){
                 return reject(new Error('server does not started yet'))
             }
-            this.server.close(conclude(resolve,reject,'closed'))
+            this.server.close(conclude(resolve,reject,'closed'));
         })
     }
 }
@@ -109,7 +111,7 @@ async function start(){
         console.log('platform',process.platform);
         const server = new EasyServer();
         await server.startListening();
-        open(`http://localhost:3303/${entryPointMenu}`);
+        open(`http://localhost:3303/${entryPoints[entryPoints.menu]}`);
         await server.becomesKilled();
         await server.stopListening();
         console.log('end of all')
