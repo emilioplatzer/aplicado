@@ -12,8 +12,8 @@
         "@types/express": "^4.17.6"
     },
     "scripts": {
-        "prepare": "tsc -p tsconfig.json",
-        "build-start": "npm run prepare & node dist/noticias.js",
+        "prepare": "tsc -p tsconfig-server.json && tcs -p tsconfig-client.json",
+        "build-start": "npm run prepare && node dist/noticias.js",
         "start": "node dist/noticias.js"
     }
 }

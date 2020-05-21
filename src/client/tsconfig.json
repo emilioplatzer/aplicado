@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "outDir": "../../dist/client",
+        "lib":["es2015","dom"],
+        "target": "es5",
+    },
+    "extends": "../../tsconfig-common.json",
+    "include": ["."]
+}
