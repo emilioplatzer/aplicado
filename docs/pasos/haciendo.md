@@ -30,3 +30,8 @@ Poner el Content-Type en los headers.
 
 Mirando como está, veo también que hay código Javascript metido dentro de strings,
 eso hay que cambiarlo por código typescript que esté donde tenga que estar. 
+
+## El .js que va al cliente esté en typescript
+
+En un archivo separado que se compile por separado
+
