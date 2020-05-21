@@ -2,6 +2,8 @@ import * as express from "express";
 
 import * as open from "open";
 import { Server } from "http";
+// @ts-expect-error por ahora no tiene .d.ts
+import * as serveContent from "serve-content";
 
 import { promises as fs } from "fs";
 import * as Path from "path";
@@ -31,12 +33,6 @@ function quote(text:string){
 const BotonCerrar=`
     <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>
     <script>
-        window.addEventListener("load", function(){
-            closeButton.addEventListener("click", function () {
-                navigator.sendBeacon('/${entryPoints[entryPoints.kill]}',new Date().toString())
-                close();
-            });
-        });
     </script>`;
 
 
@@ -52,33 +48,45 @@ class EasyServer{
             core(req,res)
         });
     }
+    async createDinamicHtmlContent(entryPoint:entryPoints, core:(pushContent:(part: string)=>void)=>Promise<void>){
+        this.listenEntryPoint(entryPoint, async (_req, res)=>{
+            res.write('<script src="lib/client.js"></script>');
+            var pushContent=(part:string)=>{
+                res.write(part);
+            }
+            await core(pushContent);
+            res.end();
+        })
+    }
     async startListening():Promise<void>{
-        this.listenEntryPoint(entryPoints.menu, (_req, res)=>{
-            res.send(`
+        this.createDinamicHtmlContent(entryPoints.menu, async (pushContent)=>{
+            pushContent(`
                 <h1>aplicado</h1>
                 <p><a href="/${entryPoints[entryPoints.lista]}">${entryPoints[entryPoints.lista]}</a></p>
                 ${BotonCerrar}
             `);
         });
-        this.listenEntryPoint(entryPoints.lista, async (_req, res)=>{
-            res.write(`<h1>files</h1><ul>`);
+        this.createDinamicHtmlContent(entryPoints.lista, async (pushContent)=>{
+            pushContent(`<h1>files</h1><ul>`);
             const basePath = 'fixtures/data';
             var dir = await fs.opendir(basePath);
             for await (const dirent of dir) {
                 if(dirent.isFile()){
-                    res.write(`<li>${quote(dirent.name)} `);
+                    pushContent(`<li>${quote(dirent.name)} `);
                     const status = await fs.stat(Path.join(basePath,dirent.name));
-                    res.write(` ${quote(status.ctime.toLocaleDateString())}</li>`)
+                    pushContent(` ${quote(status.ctime.toLocaleDateString())}</li>`)
                 }
             }
-            res.write(`</ul>${BotonCerrar}`);
-            res.end();
+            pushContent(`</ul>${BotonCerrar}`);
         });
         this.listenEntryPoint(entryPoints.kill, (_req, res)=>{
             res.send('killing...');
             console.log('recive kill')
             this.killed=true;
-        }, 'post')
+        }, 'post');
+        this.app.use('/lib', (req,res,next)=>{
+            return serveContent('./dist/client', {allowedExts:['','.html','js']})(req,res,next);
+        });
         return new Promise((resolve, reject)=>{
             console.log('start to listen')
             this.server = this.app.listen(3303, conclude(resolve, reject, 'listening'));
@@ -105,7 +113,6 @@ class EasyServer{
         })
     }
 }
-
 
 async function start(){
     try{

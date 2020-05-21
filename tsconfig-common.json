@@ -2,8 +2,8 @@
     "compilerOptions": {
         "outDir": "x:\\this-dir-must-not-be-created",
         "declaration": true,
-        "sourceMap": true,
         "inlineSources": true,
+        "inlineSourceMap": true,
         "moduleResolution": "node",
         "lib":["es2015"],
         "target": "es2016",
