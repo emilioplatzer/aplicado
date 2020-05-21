@@ -35,3 +35,12 @@ eso hay que cambiarlo por código typescript que esté donde tenga que estar.
 
 En un archivo separado que se compile por separado
 
+### bug
+
+Parecía que anda todo bien, pero el botón cerrar no lograba hacer que cierre el backend,
+mirando un poco vi que el sendBeacon manda fruta (⛯ en vez de tocino 😉). 
+
+## servir un .js con el enum
+
+Pero escribirlo una sola vez en typescript y que eso sea el origen de lo que se mande al cliente
+y el mismo archivo que use el `noticias.ts` para incluir el enum.

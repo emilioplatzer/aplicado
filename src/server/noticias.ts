@@ -80,8 +80,8 @@ class EasyServer{
             pushContent(`</ul>${BotonCerrar}`);
         });
         this.listenEntryPoint(entryPoints.kill, (_req, res)=>{
-            res.send('killing...');
             console.log('recive kill')
+            res.send('killing...');
             this.killed=true;
         }, 'post');
         this.app.use('/lib', (req,res,next)=>{
