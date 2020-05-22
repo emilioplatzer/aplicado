@@ -8,8 +8,8 @@
             "type": "node",
             "request": "launch",
             "name": "Launch",
-            "preLaunchTask": "build-all",
-            "program": "${workspaceFolder}/dist/server/server.js",
+            "preLaunchTask": "prepare",
+            "program": "${workspaceFolder}/dist-server/server-noticias.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]
@@ -18,10 +18,22 @@
             "type": "node",
             "request": "launch",
             "name": "dumpDb",
-            "preLaunchTask": "build-all",
-            "program": "${workspaceFolder}/dist/server/server.js",
+            "preLaunchTask": "prepare",
+            "program": "${workspaceFolder}/dist-server/server-noticias.js",
             "args": [
                 "--dump-db"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "test",
+            "preLaunchTask": "prepare",
+            "program": "${workspaceFolder}/dist-test/test/puppe.js",
+            "args": [
             ],
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
@@ -34,12 +46,12 @@
             // Type of configuration. Possible values: "node", "mono".
             "type": "node",
             // Workspace relative or absolute path to the program.
-            "preLaunchTask": "build-all",
+            "preLaunchTask": "prepare",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
             // Automatically stop program after launch.
             "stopOnEntry": false,
             // Command line arguments passed to the program.
-            "args": ["lib/test/*.js", "../varcal/tests/tests/*.js"],
+            "args": ["dist-test/test/puppe.js"],
             // Workspace relative or absolute path to the working directory of the program being debugged. Default is the current workspace.
             "cwd": "${workspaceFolder}",
             // Workspace relative or absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.
@@ -47,7 +59,7 @@
             // Environment variables passed to the program.
             "env": { "NODE_ENV": "testing"},
             "outFiles": [
-                "${workspaceFolder}/lib/**/*.js"
+                "${workspaceFolder}/libxxx/**/*.js"
             ]
         }        
     ]

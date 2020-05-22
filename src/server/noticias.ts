@@ -2,7 +2,6 @@ import * as express from "express";
 
 import * as open from "open";
 import { Server } from "http";
-// @ts-expect-error por ahora no tiene .d.ts
 import * as serveContent from "serve-content";
 
 import { promises as fs } from "fs";
@@ -36,7 +35,7 @@ const BotonCerrar=`
     </script>`;
 
 
-class EasyServer{
+export class EasyServer{
     private app=express();
     private server?:Server;
     private killed?:true;
@@ -62,17 +61,18 @@ class EasyServer{
         this.createDinamicHtmlContent(entryPoints.menu, async (pushContent)=>{
             pushContent(`
                 <h1>aplicado</h1>
-                <p><a href="/${entryPoints[entryPoints.lista]}">${entryPoints[entryPoints.lista]}</a></p>
+                <p><a id=listLink href="/${entryPoints[entryPoints.lista]}">${entryPoints[entryPoints.lista]}</a></p>
                 ${BotonCerrar}
             `);
         });
         this.createDinamicHtmlContent(entryPoints.lista, async (pushContent)=>{
-            pushContent(`<h1>files</h1><ul>`);
+            pushContent(`<h1 id=filesTitle>files</h1><ul>`);
             const basePath = 'fixtures/data';
             var dir = await fs.opendir(basePath);
+            var index = 0;
             for await (const dirent of dir) {
                 if(dirent.isFile()){
-                    pushContent(`<li>${quote(dirent.name)} `);
+                    pushContent(`<li id="file${++index}">${quote(dirent.name)} `);
                     const status = await fs.stat(Path.join(basePath,dirent.name));
                     pushContent(` ${quote(status.ctime.toLocaleDateString())}</li>`)
                 }
@@ -85,7 +85,7 @@ class EasyServer{
             this.killed=true;
         }, 'post');
         this.app.use('/lib', (req,res,next)=>{
-            return serveContent('./dist/client', {allowedExts:['','.html','js']})(req,res,next);
+            return serveContent('./dist-client', {allowedExts:['','.html','js']})(req,res,next);
         });
         return new Promise((resolve, reject)=>{
             console.log('start to listen')
@@ -114,13 +114,17 @@ class EasyServer{
     }
 }
 
-async function start(){
+export async function start(opts?:{skipOpen?:true, listeningServer?:EasyServer}){
     try{
         console.log('starting all');
         console.log('platform',process.platform);
-        const server = new EasyServer();
-        await server.startListening();
-        open(`http://localhost:3303/${entryPoints[entryPoints.menu]}`);
+        var server = opts && opts.listeningServer || new EasyServer();
+        if(!(opts && opts.listeningServer)){
+            await server.startListening();
+        }
+        if(!opts || !opts.skipOpen){
+            open(`http://localhost:3303/${entryPoints[entryPoints.menu]}`);
+        }
         await server.becomesKilled();
         await server.stopListening();
         console.log('end of all')
@@ -131,5 +135,4 @@ async function start(){
     }
 }
 
-start();
 

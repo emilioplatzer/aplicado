@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "../../dist-server"
+        "outDir": "../../dist-test"
     },
     "extends": "../../tsconfig-common.json",
     "include": ["."]
