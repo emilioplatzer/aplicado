@@ -20,8 +20,9 @@
     "scripts": {
         "prepare": "tsc -p tsconfig-server.json && tsc -p tsconfig-client.json && tsc -p tsconfig-test.json",
         "watch:buildC": "tsc --watch -p tsconfig-client.json",
+        "watch:buildT": "tsc --watch -p tsconfig-test.json",
         "build-start": "npm run prepare && npm start",
         "start": "node dist-server/server/server-noticias.js",
-        "test": "node dist-test/test/puppe.js"
+        "test": "mocha dist-test/test/puppe.js"
     }
 }
