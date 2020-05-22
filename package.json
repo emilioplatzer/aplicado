@@ -19,7 +19,7 @@
     },
     "scripts": {
         "prepare": "tsc -p tsconfig-server.json && tsc -p tsconfig-client.json && tsc -p tsconfig-test.json",
-        "build-start": "npm run prepare && node dist-server/server-noticias.js",
+        "build-start": "npm run prepare && node dist-server/server/server-noticias.js",
         "start": "node dist/server/noticias.js",
         "test": "node dist-test/test/puppe.js"
     }

@@ -7,6 +7,8 @@ import * as serveContent from "serve-content";
 import { promises as fs } from "fs";
 import * as Path from "path";
 
+import { APP_TITLE } from "../client/common";
+
 function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message?:string){
     return function(err?:Error|undefined){
         if(err){
@@ -49,6 +51,7 @@ export class EasyServer{
     }
     async createDinamicHtmlContent(entryPoint:entryPoints, core:(pushContent:(part: string)=>void)=>Promise<void>){
         this.listenEntryPoint(entryPoint, async (_req, res)=>{
+            res.write(`'<head><title>${APP_TITLE}</title></head>`);
             res.write('<script src="lib/client.js"></script>');
             var pushContent=(part:string)=>{
                 res.write(part);

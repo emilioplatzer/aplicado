@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Launch",
             "preLaunchTask": "prepare",
-            "program": "${workspaceFolder}/dist-server/server-noticias.js",
+            "program": "${workspaceFolder}/dist-server/server/server-noticias.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]
@@ -19,7 +19,7 @@
             "request": "launch",
             "name": "dumpDb",
             "preLaunchTask": "prepare",
-            "program": "${workspaceFolder}/dist-server/server-noticias.js",
+            "program": "${workspaceFolder}/dist-server/server/server-noticias.js",
             "args": [
                 "--dump-db"
             ],
