@@ -1,0 +1,1 @@
+export enum entryPoints {menu, kill, lista};

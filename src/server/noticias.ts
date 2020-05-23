@@ -8,6 +8,7 @@ import { promises as fs } from "fs";
 import * as Path from "path";
 
 import { APP_TITLE } from "../client/common";
+import { entryPoints } from "./model";
 
 function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message?:string){
     return function(err?:Error|undefined){
@@ -21,8 +22,6 @@ function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message
         }
     }
 }
-
-enum entryPoints {menu, kill, lista};
 
 function quote(text:string){
     return text.replace(/&/g, '&amp;')
