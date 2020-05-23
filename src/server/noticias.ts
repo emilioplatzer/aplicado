@@ -87,7 +87,7 @@ export class EasyServer{
             this.killed=true;
         }, 'post');
         this.app.use('/lib', (req,res,next)=>{
-            return serveContent('./dist-client', {allowedExts:['','.html','js']})(req,res,next);
+            return serveContent('./dist-client/client', {allowedExts:['','.html','js']})(req,res,next);
         });
         return new Promise((resolve, reject)=>{
             console.log('start to listen')
