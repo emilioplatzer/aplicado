@@ -36,6 +36,7 @@ const BotonCerrar=`
 
 
 export class EasyServer{
+    private SAFE_EXTS = ['','.html','js'];
     private app=express();
     private server?:Server;
     private killed?:true;
@@ -49,9 +50,10 @@ export class EasyServer{
     }
     async createDinamicHtmlContent(entryPoint:entryPoints, core:(pushContent:(part: string)=>void)=>Promise<void>){
         this.listenEntryPoint(entryPoint, async (_req, res)=>{
-            res.write(`'<head><title>${APP_TITLE}</title></head>`);
-            res.write('<script src="lib/client.js"></script>');
+            res.write(`<head><title>${APP_TITLE}</title></head>`);
+            res.write('<script src="require-bro/require-bro.js"></script>');
             res.write('<script src="lib/common.js"></script>');
+            res.write('<script src="lib/client.js"></script>');
             var pushContent=(part:string)=>{
                 res.write(part);
             }
@@ -86,9 +88,14 @@ export class EasyServer{
             res.send('killing...');
             this.killed=true;
         }, 'post');
-        this.app.use('/lib', (req,res,next)=>{
-            return serveContent('./dist-client', {allowedExts:['','.html','js']})(req,res,next);
-        });
+        [
+            {urlPart:'/require-bro', serverPath:'./node_modules/require-bro/lib/'},
+            {urlPart:'/lib', serverPath:'./dist-client'}
+        ].forEach((module)=>{
+            this.app.use(module.urlPart, (req,res,next)=>{
+                return serveContent(module.serverPath, {allowedExts:this.SAFE_EXTS})(req,res,next);
+            });
+        })
         return new Promise((resolve, reject)=>{
             console.log('start to listen')
             this.server = this.app.listen(3303, conclude(resolve, reject, 'listening'));

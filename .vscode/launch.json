@@ -17,6 +17,15 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Fast-Launch",
+            "program": "${workspaceFolder}/dist-server/server/server-noticias.js",
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "dumpDb",
             "preLaunchTask": "prepare",
             "program": "${workspaceFolder}/dist-server/server/server-noticias.js",
@@ -40,23 +49,29 @@
             ]
         },
         {
-            // Name of configuration; appears in the launch configuration drop down menu.
             "name": "Run mocha",
             "request": "launch",
-            // Type of configuration. Possible values: "node", "mono".
             "type": "node",
-            // Workspace relative or absolute path to the program.
             "preLaunchTask": "prepare",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            // Automatically stop program after launch.
             "stopOnEntry": false,
-            // Command line arguments passed to the program.
             "args": ["dist-test/test/puppe.js"],
-            // Workspace relative or absolute path to the working directory of the program being debugged. Default is the current workspace.
             "cwd": "${workspaceFolder}",
-            // Workspace relative or absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.
             "runtimeExecutable": null,
-            // Environment variables passed to the program.
+            "env": { "NODE_ENV": "testing"},
+            "outFiles": [
+                "${workspaceFolder}/libxxx/**/*.js"
+            ]
+        },   
+        {
+            "name": "Fast mocha",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "stopOnEntry": false,
+            "args": ["dist-test/test/puppe.js"],
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": null,
             "env": { "NODE_ENV": "testing"},
             "outFiles": [
                 "${workspaceFolder}/libxxx/**/*.js"
