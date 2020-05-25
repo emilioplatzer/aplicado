@@ -44,3 +44,20 @@ mirando un poco vi que el sendBeacon manda fruta (⛯ en vez de tocino 😉).
 
 Pero escribirlo una sola vez en typescript y que eso sea el origen de lo que se mande al cliente
 y el mismo archivo que use el `noticias.ts` para incluir el enum.
+
+### el enum y el require-bro
+
+Para que funcione el UMD usé [require-bro](https://github.com/codenautas/require-bro/blob/HEAD/LEEME.md)
+porque era lo que conocía y quería avanzar. Si bien funciona bien, hubiera preferido webpack que es una librería difundida.
+
+El `enum` resultó una buena forma de agrupar los nombres de los entryPoints. 
+Conversamos esto con Eugenio y descartamo otras alternativas.
+   1. usar strings directos `'kill', 'menu'` tienen el problema de que no se puede refactorizar (o sea cambiar el nombre y que impacte en todos lados)
+   1. Usar una serie de constantes: `const KILL='kill'; const MENU='menu'` refactoriza pero no hay tipo, 
+      o sea si se pasa como parámetro `'kill2'` no va a fallar por tipos. 
+      Pasando `'kill'` no falla por tipos ni comportamiento 
+      pero es un punto débil porque no refactoriza ese caso
+   1. Usar un objeto de puente `urls={kill: 'kill', menu: 'menu'}` tiene problemas similares a tener una serie de constantes
+
+Aún así `enum` tiene un punto débil al mapear a strings y usar internamente number. 
+Por ahora seguimos con esto pero estamos atentos a otras desventajas que puedan aparecer.
