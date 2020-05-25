@@ -1,7 +1,11 @@
+// import { entryPoints } from "./common";
+
 window.addEventListener("load", function(){
     var closeButton = document.getElementById('closeButton');
     closeButton?.addEventListener("click", function () {
-        navigator.sendBeacon('/kill',new Date().toString())
+        // console.log('enum kill:'+entryPoints.kill)
+        // console.log('enum:'+entryPoints);
+        navigator.sendBeacon('/kill', new Date().toString())
         close();
     });
 });
