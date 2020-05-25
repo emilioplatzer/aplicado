@@ -7,8 +7,7 @@ import * as serveContent from "serve-content";
 import { promises as fs } from "fs";
 import * as Path from "path";
 
-import { APP_TITLE } from "../client/common";
-import { entryPoints } from "./model";
+import { APP_TITLE, entryPoints } from "../client/common";
 
 function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message?:string){
     return function(err?:Error|undefined){
@@ -52,6 +51,7 @@ export class EasyServer{
         this.listenEntryPoint(entryPoint, async (_req, res)=>{
             res.write(`'<head><title>${APP_TITLE}</title></head>`);
             res.write('<script src="lib/client.js"></script>');
+            res.write('<script src="lib/common.js"></script>');
             var pushContent=(part:string)=>{
                 res.write(part);
             }
@@ -87,7 +87,7 @@ export class EasyServer{
             this.killed=true;
         }, 'post');
         this.app.use('/lib', (req,res,next)=>{
-            return serveContent('./dist-client/client', {allowedExts:['','.html','js']})(req,res,next);
+            return serveContent('./dist-client', {allowedExts:['','.html','js']})(req,res,next);
         });
         return new Promise((resolve, reject)=>{
             console.log('start to listen')
