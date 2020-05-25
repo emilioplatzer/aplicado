@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "x:\\this-dir-must-not-be-created",
-        "declaration": true,
+        // "declaration": true,
         "inlineSources": true,
         "inlineSourceMap": true,
         "moduleResolution": "node",
@@ -11,7 +11,7 @@
         "skipLibCheck": true, //para que no haga chequeo de tipos en los declaration files dentro de node-modules(pg-promise-strict, express, node)
         "module": "UMD",
         "typeRoots" : ["node_modules/@types", "node_modules/types.d.ts/modules"],
-        "declarationMap": true,
+        // "declarationMap": true,
         "noImplicitAny": true,
         "alwaysStrict": true,
         "noUnusedLocals": true,
