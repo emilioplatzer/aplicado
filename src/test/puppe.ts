@@ -38,6 +38,7 @@ describe("basic complete tests", function(){
 
 describe("exit tests", function(){
     this.timeout(5000);
+    // this.timeout(135000); // some linux take 2 minutes to close
     var browser: Browser;
     var page: Page;
     beforeEach(async ()=>{
