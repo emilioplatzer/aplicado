@@ -2,6 +2,6 @@
     "compilerOptions": {
         "outDir": "../../dist-server"
     },
-    "extends": "../../tsconfig-common.json",
+    "extends": "../tsconfig-common.json",
     "include": ["."]
 }

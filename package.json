@@ -19,10 +19,8 @@
         "open": "^7.0.4"
     },
     "scripts": {
-        "prepare": "tsc -p tsconfig-server.json && tsc -p tsconfig-client.json && tsc -p tsconfig-test.json",
-        "watch:buildC": "tsc --watch -p tsconfig-client.json",
-        "watch:buildS": "tsc --watch -p tsconfig-server.json",
-        "watch:buildT": "tsc --watch -p tsconfig-test.json",
+        "prepare": "tsc -b src/client/ src/server src/test",
+        "watch:prepare": "npm run prepare -- --watch",
         "build-start": "npm run prepare && npm start",
         "start": "node dist-server/server/server-noticias.js",
         "test": "mocha dist-test/test/puppe.js"
