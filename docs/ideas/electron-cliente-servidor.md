@@ -31,7 +31,7 @@ que solo forme parte del código del grontend y que haga las llamadas a los entr
 
 ### Algo así
 
-express-principal.ts
+electron-principal.ts
 ```ts
 //...
 
@@ -50,16 +50,14 @@ class Principal{
 }
 ```
 
-
-express-visualizador.tsx
+electron-visualizador.tsx
 ```tsx
-import {Principal} from "./express-principal"
-
+import {Principal} from "./electron-principal"
 
 class Visualizador{
     private principal:Principal;
     async mostrarNoticias(){
-        var noticias = await this.principa.getNoticias();
+        var noticias = await this.principal.getNoticias();
         this.render(
             <Paper>
                 ${noticias.forEach(noticia=>
@@ -79,5 +77,37 @@ class Visualizador{
         )
     }
 }
+```
 
+Podría adaptarse al modelo cliente servidor agregando una capa express:
+```ts
+import {Principal} from "./electron-principal"
+
+function servirEntryPoints(){
+    this.app.post('/entry-point/getNoticias',(_req,res)=>{
+        var noticias = await this.principal.getNoticias();
+        res.sendJson(noticias);
+    })
+}
+```
+
+Y un objeto Principal proxy:
+
+express-principal-proxy.ts
+```ts
+export class Principal{
+    async getNoticias(){
+        var response = await fetch('/entry-point/getNoticias')
+        return await response.json();
+    } 
+}
+```
+
+Luego es solo cuestión en el cliente de quitar las llamadas a Electrón y cambiar el import
+```ts
+// antes, en electron:
+import {Principal} from "./electron-principal"
+
+// luego, en express:
+import {Principal} from "./express-principal-proxy"
 ```
