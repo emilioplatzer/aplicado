@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 
-import { APP_TITLE, entryPoints } from '../client/common';
+import { APP_TITLE, EntryPoints, Commons } from '../client/common';
 
 import { start } from '../server/noticias';
 
@@ -13,10 +13,12 @@ async function createWindow(){
         }
     });
     console.log('abriendo el backend')
-    start({skipOpen:true});
+    var common = new Commons();
+    common.setDevelMode({entryPointPrefix:'x'+Math.random()})
+    start({skipOpen:true, common});
     console.log('abriendo en index de ', APP_TITLE);
     //win.loadFile('index.html');
-    win.loadURL(`http://localhost:3303/${entryPoints[entryPoints.menu]}`)
+    win.loadURL(`http://localhost:3303/${common.entryPointsString(EntryPoints.menu)}`)
     win.webContents.openDevTools()
 }
 
