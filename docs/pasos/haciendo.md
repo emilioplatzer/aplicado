@@ -61,3 +61,10 @@ Conversamos esto con Eugenio y descartamo otras alternativas.
 
 Aún así `enum` tiene un punto débil al mapear a strings y usar internamente number. 
 Por ahora seguimos con esto pero estamos atentos a otras desventajas que puedan aparecer.
+
+## Electron simultáneo
+
+Empiezo con la idea de escribir código Electrón. Por ahora solo puse una pequeña capa Electrón como describo en [docs/ideas](https://github.com/codenautas/aplicado/blob/master/docs/ideas/electron-cliente-servidor.md#de-clienteservidor-a-express).
+
+Agrego un destino dist-electron para contener la capa Electron. 
+

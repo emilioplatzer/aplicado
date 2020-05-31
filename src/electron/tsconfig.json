@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "outDir": "../../dist-electron"
+    },
+    "extends": "../tsconfig-common.json",
+    "include": ["."]
+}

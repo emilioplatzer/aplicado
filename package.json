@@ -1,10 +1,11 @@
 {
     "name": "aplicado",
     "description": "Noticias de ayer",
-    "version": "0.0.1",
+    "version": "0.0.2",
+    "main": "dist-electron/electron/main-electron.js",
     "dependencies": {
         "express": "^4.17.1",
-        "require-bro": "~0.1.13",
+        "require-bro": "~0.2.0",
         "serve-content": "~0.3.12"
     },
     "devDependencies": {
@@ -13,13 +14,15 @@
         "@types/express": "^4.17.6",
         "@types/mocha": "^7.0.2",
         "@types/puppeteer": "^3.0.0",
+        "electron": "^9.0.0",
         "mocha": "^7.1.2",
         "puppeteer": "^3.1.0",
         "types.d.ts": "~0.5.0",
         "open": "^7.0.4"
     },
     "scripts": {
-        "prepare": "tsc -b src/client/ src/server src/test",
+        "electron": "electron .",
+        "prepare": "tsc -b src/client/ src/server src/test src/electron",
         "watch:prepare": "npm run prepare -- --watch",
         "build-start": "npm run prepare && npm start",
         "start": "node dist-server/server/server-noticias.js",
