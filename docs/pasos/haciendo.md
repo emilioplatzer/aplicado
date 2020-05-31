@@ -87,3 +87,21 @@ app.get(`/${entryPoints[entryPoints.kill]}`);
 app.get(`/${entryPointsStr(entryPoints.kill)}`);
 ```
 
+### desarrollo del prefijo de los entry-points
+
+En el último commit tuve que tocar demasiadas cosas para lo que parecía una tarea sencilla. 
+
+Poner una función hubiera sido fácil, lo que pasó es que al sortear un prefijo había que trasmitir ese sorteo al cliente. 
+Además para el caso de prueba era necesario conocer también el prefijo 
+(o en todo caso el mecanismo, inicializado, de armar los textos de los entry points). 
+
+Para eso tuve que poder transmitir de una forma dinámica el conocimiento (el valor sorteado) entre el servidor y el cliente.
+
+## Electron primero
+
+Voy a tratar de invertir la lógica. 
+Hacer que funcione primero en Electron y derivar de ahí el modelo cliente servidor. 
+
+Espero que eso simplifique los entry-points (aunque seguirán los problemas de las pruebas, quizás).
+Invirtiendo la lógica los entry-points deberían conocerse solo para la serialización entre front-end y back-end. 
+
