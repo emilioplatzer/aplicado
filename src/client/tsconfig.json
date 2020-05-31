@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "amd",
+        "module": "UMD",
         "outDir": "../../dist-client",
         "lib":["es2015","dom"],
         "target": "es5",
