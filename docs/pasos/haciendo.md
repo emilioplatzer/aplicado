@@ -68,3 +68,22 @@ Empiezo con la idea de escribir código Electrón. Por ahora solo puse una peque
 
 Agrego un destino dist-electron para contener la capa Electron. 
 
+## Me preocupan los nombres de los entry-points
+
+La forma que tienen los entry points son cómodos para hacer refactoring y para asegurarse que va el tipo correcto,
+pero tiene un defecto, no hay modo de asegurarse que algún programador distraído escriba el texto a mano. 
+
+Entonces se me ocurre que en durante el desarrollo todos los nombres de los entry-point estén prefijados por un número al azar,
+de ese modo no hay manera de poner uno a mano y que funcione.
+Es cierto que eso va a saltar duarnte las pruebas de uso. Pero vamos a estar en una mejor situación.
+
+Entonces el _idiom_ para los strings de los entry points tiene que ser llamar a una función y no al arreglo que invierte el enum.
+
+```ts
+// O sea en vez de
+app.get(`/${entryPoints[entryPoints.kill]}`);
+
+// Usar
+app.get(`/${entryPointsStr(entryPoints.kill)}`);
+```
+
