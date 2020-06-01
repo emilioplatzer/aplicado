@@ -97,6 +97,12 @@ Además para el caso de prueba era necesario conocer también el prefijo
 
 Para eso tuve que poder transmitir de una forma dinámica el conocimiento (el valor sorteado) entre el servidor y el cliente.
 
+## Seguridad 1
+
+Ahí me di cuenta que estaba dando advertencias de inseguro. 
+Así que en bse a https://www.electronjs.org/docs/tutorial/security#2-do-not-enable-nodejs-integration-for-remote-content
+hice algunos cambios que subo ahora. 
+
 ## Electron primero
 
 Voy a tratar de invertir la lógica. 

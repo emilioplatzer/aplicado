@@ -31,9 +31,7 @@ function quote(text:string){
 }
 
 const BotonCerrar=`
-    <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>
-    <script>
-    </script>`;
+    <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>`;
 
 
 export class EasyServer{
@@ -51,7 +49,10 @@ export class EasyServer{
     }
     async createDinamicHtmlContent(entryPoint:EntryPoints, core:(pushContent:(part: string)=>void)=>Promise<void>){
         this.listenEntryPoint(entryPoint, async (_req, res)=>{
-            res.write(`<head><title>${APP_TITLE}</title></head>`);
+            res.write(`<head>
+                <title>${APP_TITLE}</title>
+                <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+            </head>`);
             res.write('<script src="require-bro/require-bro.js"></script>');
             res.write('<script src="lib/common.js"></script>');
             res.write('<script src="lib/common-instance.js"></script>');
