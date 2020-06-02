@@ -23,7 +23,8 @@
     },
     "scripts": {
         "electron": "electron .",
-        "prepare": "tsc -b src/client/ src/server src/test src/electron",
+        "build:force": "tsc -p tsconfig-server.json & tsc -p tsconfig-client.json & tsc -p tsconfig-test.json",	
+        "prepare": "tsc -b src/client src/server src/test src/electron",
         "watch:prepare": "npm run prepare -- --watch",
         "build-start": "npm run prepare && npm start",
         "start": "node dist-server/server/server-noticias.js",
