@@ -64,24 +64,32 @@ export class EasyServer{
             res.end();
         })
     }
+    getBackButtonIfNeeded(){
+        return '<button id=back-arrow>⬅</button> '
+    }
     async startListening():Promise<void>{
         this.createDinamicHtmlContent(EntryPoints.menu, async (pushContent)=>{
             pushContent(`
-                <h1>aplicado</h1>
-                <p><a id=listLink href="/${this.common.entryPointsString(EntryPoints.lista)}">${this.common.entryPointsString(EntryPoints.lista)}</a></p>
+                <h1>Bienvenido a Aplicado</h1>
+                <p>El primer <a id=listLink href="/${this.common.entryPointsString(EntryPoints.lista)}">portal de noticias</a> que solo sirve para ilustrar esto</p>
                 ${BotonCerrar}
             `);
         });
         this.createDinamicHtmlContent(EntryPoints.lista, async (pushContent)=>{
+            pushContent(this.getBackButtonIfNeeded());
             pushContent(`<h1 id=filesTitle>files</h1><ul>`);
-            const basePath = 'fixtures/data';
+            const basePath = 'fixtures/noticias';
             var dir = await fs.opendir(basePath);
             var index = 0;
             for await (const dirent of dir) {
-                if(dirent.isFile()){
-                    pushContent(`<li id="file${++index}">${quote(dirent.name)} `);
-                    const status = await fs.stat(Path.join(basePath,dirent.name));
-                    pushContent(` ${quote(status.ctime.toLocaleDateString())}</li>`)
+                if(dirent.isFile() && dirent.name.endsWith('.md')){
+                    var content = await fs.readFile(Path.join(basePath,dirent.name), 'utf8');
+                    var title = content.match(/^#\s*([^\r\n]+)(\r\n|$)/)?.[1];
+                    if(title){
+                        pushContent(`<li id="file${++index}"><b>${quote(title)}</b> `);
+                        const status = await fs.stat(Path.join(basePath,dirent.name));
+                        pushContent(` ${quote(status.ctime.toLocaleDateString())}</li>`)
+                    }
                 }
             }
             pushContent(`</ul>${BotonCerrar}`);

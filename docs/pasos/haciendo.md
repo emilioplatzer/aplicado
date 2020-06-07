@@ -100,7 +100,7 @@ Para eso tuve que poder transmitir de una forma dinámica el conocimiento (el va
 ## Seguridad 1
 
 Ahí me di cuenta que estaba dando advertencias de inseguro. 
-Así que en bse a https://www.electronjs.org/docs/tutorial/security#2-do-not-enable-nodejs-integration-for-remote-content
+Así que en base a https://www.electronjs.org/docs/tutorial/security#2-do-not-enable-nodejs-integration-for-remote-content
 hice algunos cambios que subo ahora. 
 
 ## Electron primero
@@ -111,3 +111,7 @@ Hacer que funcione primero en Electron y derivar de ahí el modelo cliente servi
 Espero que eso simplifique los entry-points (aunque seguirán los problemas de las pruebas, quizás).
 Invirtiendo la lógica los entry-points deberían conocerse solo para la serialización entre front-end y back-end. 
 
+## Aclarar la funcionalidad
+
+Para ordenar lo que sigue tengamos en cuenta [¿qué vamos a construir?](https://github.com/codenautas/aplicado#qu%C3%A9-vamos-a-construir).
+Voy a mejorar un poco la funcionalidad actual (sin cambiar la estructura del sistema) para que se parezca mas a la idea original.
