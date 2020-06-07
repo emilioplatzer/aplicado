@@ -115,3 +115,20 @@ Invirtiendo la lógica los entry-points deberían conocerse solo para la seriali
 
 Para ordenar lo que sigue tengamos en cuenta [¿qué vamos a construir?](https://github.com/codenautas/aplicado#qu%C3%A9-vamos-a-construir).
 Voy a mejorar un poco la funcionalidad actual (sin cambiar la estructura del sistema) para que se parezca mas a la idea original.
+
+### noticias de ayer
+
+Agregué una carpeta `/fixtures/noticias` donde hay un archivo por noticia del que se puede extraer el título y la fecha.
+Ahora el sistema tiene una página de bienvenida y una de noticias donde por ahora solo muestra el título y la fecha.
+
+Ahí se podría haber usado funciones `obtenerTitulo` y `obtenerFecha`, ya aparecerán. 
+
+### botón volver
+
+Electrón no tiene la barra de navegación. Así que agregué el botón volver. 
+Hay otras situaciones donde habría que agregarlo también (por ejemplo si se hace una [PWA](https://developers.google.com/web/fundamentals/codelabs/your-first-pwapp?hl=es)). 
+
+Por eso en vez de preguntar si estoy en Electrón, pregunto si necesito un botón volver.
+
+
+
