@@ -18,3 +18,5 @@ export class Commons{
         return `${prefix}${EntryPoints[entryPoints]}`;
     }
 }
+
+export type TitulosData = {title:string, date:Date};

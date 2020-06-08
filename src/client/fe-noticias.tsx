@@ -1,15 +1,20 @@
+const { ipcRenderer } = require('electron')
+
 import * as React from 'react';
 import { 
+    useEffect,
     useState,
     ReactChildren
 } from 'react';
-import { render}  from 'react-dom';
+import { render }  from 'react-dom';
 
 import { Button, createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 
-enum Pantalla { principal, titulos }
+import { TitulosData } from './common'
 
-type TitulosData = {title:string, date:Date};
+// import { EasyServer } from '../server/noticias';
+
+enum Pantalla { principal, titulos }
 
 const IrAPantalla = (props:{pantalla:Pantalla, setPantalla:(destino:Pantalla)=>void, children:ReactChildren|string}) => 
 <Button color="secondary"
@@ -19,11 +24,19 @@ const IrAPantalla = (props:{pantalla:Pantalla, setPantalla:(destino:Pantalla)=>v
 </Button>
 
 const Titulos = (props:{setPantalla:(destino:Pantalla)=>void}) => {
-    const titulos: TitulosData[] = [{
-        title:'ejemplo1', date:new Date()
-    },{
-        title:'ejemplo 2', date:new Date()
-    },];
+    const [titulos, setTitulos] = useState<TitulosData[]>([
+        {title:'...', date:new Date()}
+    ]);
+    useEffect(()=>{
+        var resultId = ipcRenderer.sendSync('getTitulos', {});
+        ipcRenderer.on(resultId, (_event:any, arg:any) => {
+            if(arg.error){
+            }
+            if(arg.result){
+                setTitulos(arg.result)
+            }
+        })
+    },[])
     return <>
         <IrAPantalla pantalla={Pantalla.principal} setPantalla={props.setPantalla}> ⬅ </IrAPantalla>
         <h1 id="filesTitle">títulos</h1>
@@ -61,12 +74,13 @@ const theme = createMuiTheme({
   },
 });
 
-const NoticiasReact = () => 
+const NoticiasReact = (/*props:{server:EasyServer}*/) => 
 <ThemeProvider theme={theme}>
     <CssBaseline/>
     <PantallasReact/>
 </ThemeProvider>;
 
 window.addEventListener('load', ()=>{
+
     render(<NoticiasReact/>, document.getElementById('main-div'));
 })

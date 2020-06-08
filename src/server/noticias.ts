@@ -8,7 +8,7 @@ import { promises as fs } from "fs";
 import * as Path from "path";
 import * as MiniTools from "mini-tools";
 
-import { APP_TITLE, EntryPoints, Commons } from "../client/common";
+import { APP_TITLE, EntryPoints, Commons, TitulosData } from "../client/common";
 
 function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message?:string){
     return function(err?:Error|undefined){
@@ -116,25 +116,6 @@ export class EasyServer{
                 ${BotonCerrar}
             `);
         });
-        this.createDinamicHtmlContent(EntryPoints.lista, async (pushContent)=>{
-            pushContent(this.getBackButtonIfNeeded());
-            pushContent(`<h1 id=filesTitle>files</h1><ul>`);
-            const basePath = 'fixtures/noticias';
-            var dir = await fs.opendir(basePath);
-            var index = 0;
-            for await (const dirent of dir) {
-                if(dirent.isFile() && dirent.name.endsWith('.md')){
-                    var content = await fs.readFile(Path.join(basePath,dirent.name), 'utf8');
-                    var title = content.match(/^#\s*([^\r\n]+)(\r\n|$)/)?.[1];
-                    if(title){
-                        pushContent(`<li id="file${++index}"><b>${quote(title)}</b> `);
-                        const status = await fs.stat(Path.join(basePath,dirent.name));
-                        pushContent(` ${quote(status.ctime.toLocaleDateString())}</li>`)
-                    }
-                }
-            }
-            pushContent(`</ul>${BotonCerrar}`);
-        });
         this.listenEntryPoint(EntryPoints.kill, (_req, res)=>{
             console.log('recive kill')
             res.send('killing...');
@@ -157,6 +138,22 @@ export class EasyServer{
             console.log('start to listen')
             this.server = this.app.listen(3303, conclude(resolve, reject, 'listening'));
         });
+    }
+    async getTitulos():Promise<TitulosData[]>{
+        var result:TitulosData[] = [];
+        const basePath = 'fixtures/noticias';
+        var dir = await fs.opendir(basePath);
+        for await (const dirent of dir) {
+            if(dirent.isFile() && dirent.name.endsWith('.md')){
+                var content = await fs.readFile(Path.join(basePath,dirent.name), 'utf8');
+                var title = content.match(/^#\s*([^\r\n]+)(\r\n|$)/)?.[1];
+                const status = await fs.stat(Path.join(basePath,dirent.name));
+                if(title){
+                    result.push({title, date:status.ctime})
+                }
+            }
+        }
+        return result;
     }
     async becomesKilled(){
         return new Promise((resolve)=>{

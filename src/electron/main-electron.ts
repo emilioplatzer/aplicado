@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow , ipcMain } from 'electron';
 
 import { APP_TITLE, EntryPoints, Commons } from '../client/common';
 
@@ -7,12 +7,15 @@ console.log(EntryPoints)
 import { EasyServer } from '../server/noticias';
 import { promises as fs } from 'fs';
 
+var resultCounter=0;
+
 async function createWindow(){
     const win = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
-            contextIsolation: true
+            nodeIntegration: true,
+            // contextIsolation: true
         }
     });
     console.log('abriendo el backend')
@@ -23,6 +26,14 @@ async function createWindow(){
         ...server.scriptList(),
         {path:'dist-client/client/fe-noticias.js'}
     ]});
+    ipcMain.on('getTitulos', (event, _arg) => {
+        var resultId = `result_${resultCounter++}`;
+        event.returnValue = resultId;
+        server.getTitulos().then(
+            (result:any )=>event.sender.send(resultId, {result}),
+            (error:Error)=>event.sender.send(resultId, {error} ),
+        )
+    })
     var mainHtmlFileName = 'dist-electron/client/main-electron.html'
     await fs.writeFile(mainHtmlFileName, mainHtml, 'utf8');
     console.log('abriendo en index de', APP_TITLE);
