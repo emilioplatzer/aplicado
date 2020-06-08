@@ -34,12 +34,55 @@ const BotonCerrar=`
     <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>`;
 
 
+interface ScriptForMainHtml {
+    readonly path:string
+    readonly develPath?:string
+}
+interface OptsCreateMainHtml {
+    readonly title:string
+    readonly scripts:ScriptForMainHtml[]
+    readonly scriptBasePath:string
+}
+
 export class EasyServer{
     private SAFE_EXTS = ['','.html','js'];
     private app=express();
     private server?:Server;
     private killed?:true;
     constructor(private common:Commons){
+    }
+    async createMainHtml(opts:OptsCreateMainHtml){
+        var develMode = this.common.getDevelMode();
+        return (
+`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>${quote(opts.title)}</title>
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self'; 
+        style-src   'self' 'unsafe-inline' *.googleapis.com https://fonts.googleapis.com/css; 
+        font-src    'self' https://*.gstatic.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  </head>
+  <body>
+    <div id=main-div>
+    </div>
+    <div id=all-scripts>
+      ${opts.scripts.map(s=>`<script src="${Path.join(opts.scriptBasePath, develMode && s.develPath || s.path)}"></script>`).join(`
+      `)}
+    </div>
+  </body>
+</html>`);
+    }
+    scriptList():ScriptForMainHtml[]{
+        return [
+            {develPath:'node_modules/react/umd/react.development.js', path:'node_modules/react/umd/react.production.min.js'},
+            {develPath:'node_modules/react-dom/umd/react-dom.development.js', path:'node_modules/react-dom/umd/react-dom.production.min.js'},
+            {develPath:'node_modules/@material-ui/core/umd/material-ui.development.js', path:'node_modules/@material-ui/core/umd/material-ui.production.min.js'},
+            {path:'node_modules/require-bro/lib/require-bro.js'},
+            {path:'dist-client/client/adapt.js'},
+        ]
     }
     listenEntryPoint(entryPoint:EntryPoints, core:(req:express.Request, res:express.Response)=>void, method:('get'|'post')='get'){
         this.app[method](`/${this.common.entryPointsString(entryPoint)}`, (req,res)=>{
@@ -70,8 +113,6 @@ export class EasyServer{
     async startListening():Promise<void>{
         this.createDinamicHtmlContent(EntryPoints.menu, async (pushContent)=>{
             pushContent(`
-                <h1>Bienvenido a Aplicado</h1>
-                <p>El primer <a id=listLink href="/${this.common.entryPointsString(EntryPoints.lista)}">portal de noticias</a> que solo sirve para ilustrar esto</p>
                 ${BotonCerrar}
             `);
         });

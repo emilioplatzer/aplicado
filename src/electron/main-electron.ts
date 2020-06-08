@@ -2,7 +2,10 @@ import { app, BrowserWindow } from 'electron';
 
 import { APP_TITLE, EntryPoints, Commons } from '../client/common';
 
-import { start } from '../server/noticias';
+console.log(EntryPoints)
+
+import { EasyServer } from '../server/noticias';
+import { promises as fs } from 'fs';
 
 async function createWindow(){
     const win = new BrowserWindow({
@@ -15,10 +18,16 @@ async function createWindow(){
     console.log('abriendo el backend')
     var common = new Commons();
     common.setDevelMode({entryPointPrefix:'x'+Math.random()})
-    start({skipOpen:true, common});
-    console.log('abriendo en index de ', APP_TITLE);
-    //win.loadFile('index.html');
-    win.loadURL(`http://localhost:3303/${common.entryPointsString(EntryPoints.menu)}`)
+    var server = new EasyServer(common)
+    var mainHtml = await server.createMainHtml({title:'Aplicado', scriptBasePath:process.cwd(), scripts:[
+        ...server.scriptList(),
+        {path:'dist-client/client/fe-noticias.js'}
+    ]});
+    var mainHtmlFileName = 'dist-electron/client/main-electron.html'
+    await fs.writeFile(mainHtmlFileName, mainHtml, 'utf8');
+    console.log('abriendo en index de', APP_TITLE);
+    win.loadFile(mainHtmlFileName);
+    //win.loadURL(`http://localhost:3303/${common.entryPointsString(EntryPoints.menu)}`)
     win.webContents.openDevTools()
 }
 

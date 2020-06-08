@@ -5,6 +5,11 @@
     "main": "dist-electron/electron/main-electron.js",
     "dependencies": {
         "express": "^4.17.1",
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1",
+        "@material-ui/core": "~4.10.0",
+        "@material-ui/icons": "~4.9.1",
+        "@material-ui/lab": "^4.0.0-alpha.54",
         "mini-tools": "^1.10.0",
         "require-bro": "~0.2.1",
         "serve-content": "~0.3.12"
@@ -15,6 +20,8 @@
         "@types/express": "^4.17.6",
         "@types/mocha": "^7.0.2",
         "@types/puppeteer": "^3.0.0",
+        "@types/react": "^16.9.35",
+        "@types/react-dom": "^16.9.8",
         "electron": "^9.0.0",
         "mocha": "^7.1.2",
         "puppeteer": "^3.1.0",
@@ -26,6 +33,8 @@
         "build:force": "tsc -p src/client & tsc -p src/server & tsc -p src/test & tsc -p src/electron",
         "prepare": "tsc -b src/client src/server src/test src/electron",
         "watch:prepare": "npm run prepare -- --watch",
+        "watch:client": "tsc -p src/client --watch",
+        "watch:electron": "tsc -p src/electron --watch",
         "build-start": "npm run prepare && npm start",
         "start": "node dist-server/server/server-noticias.js",
         "test": "mocha dist-test/test/puppe.js"
