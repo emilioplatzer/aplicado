@@ -1,4 +1,4 @@
-import { app, BrowserWindow , ipcMain } from 'electron';
+import { app, BrowserWindow , ipcMain} from 'electron';
 
 import { APP_TITLE, EntryPoints, Commons } from '../client/common';
 
@@ -14,8 +14,9 @@ async function createWindow(){
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true,
-            // contextIsolation: true
+            contextIsolation: true,
+            enableRemoteModule: false,
+            preload:process.cwd()+'/src/electron/electron-preload.js'
         }
     });
     console.log('abriendo el backend')
@@ -33,7 +34,7 @@ async function createWindow(){
             (result:any )=>event.sender.send(resultId, {result}),
             (error:Error)=>event.sender.send(resultId, {error} ),
         )
-    })
+    });
     var mainHtmlFileName = 'dist-electron/client/main-electron.html'
     await fs.writeFile(mainHtmlFileName, mainHtml, 'utf8');
     console.log('abriendo en index de', APP_TITLE);

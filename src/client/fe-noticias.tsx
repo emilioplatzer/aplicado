@@ -1,5 +1,3 @@
-const { ipcRenderer } = require('electron')
-
 import * as React from 'react';
 import { 
     useEffect,
@@ -28,14 +26,8 @@ const Titulos = (props:{setPantalla:(destino:Pantalla)=>void}) => {
         {title:'...', date:new Date()}
     ]);
     useEffect(()=>{
-        var resultId = ipcRenderer.sendSync('getTitulos', {});
-        ipcRenderer.on(resultId, (_event:any, arg:any) => {
-            if(arg.error){
-            }
-            if(arg.result){
-                setTitulos(arg.result)
-            }
-        })
+        // @ts-ignore
+        noticias.getTitulos({}).then(result=>setTitulos(result));
     },[])
     return <>
         <IrAPantalla pantalla={Pantalla.principal} setPantalla={props.setPantalla}> ⬅ </IrAPantalla>
