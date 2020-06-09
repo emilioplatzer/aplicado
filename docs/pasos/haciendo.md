@@ -130,5 +130,9 @@ Hay otras situaciones donde habría que agregarlo también (por ejemplo si se ha
 
 Por eso en vez de preguntar si estoy en Electrón, pregunto si necesito un botón volver.
 
+## React + ipc 
 
+Pasé el frontEnd a React y lo conecté con el Backend de Electrón usando IPC. 
+Queda entonces por hacer lo mismo en el modelo cliente servidor y 
+limpiar cosas raras como `becomesKilled` que fue útil durante los primeros experimientos.
 
