@@ -1,11 +1,11 @@
 import { app, BrowserWindow , ipcMain} from 'electron';
 
-import { APP_TITLE, EntryPoints, Commons } from '../client/common';
-
-console.log(EntryPoints)
+import { APP_TITLE, Commons } from '../client/common';
 
 import { EasyServer } from '../server/noticias';
 import { promises as fs } from 'fs';
+
+import * as Path from 'path';
 
 var resultCounter=0;
 
@@ -22,11 +22,13 @@ async function createWindow(){
     console.log('abriendo el backend')
     var common = new Commons();
     common.setDevelMode({entryPointPrefix:'x'+Math.random()})
-    var server = new EasyServer(common)
-    var mainHtml = await server.createMainHtml({title:'Aplicado', scriptBasePath:process.cwd(), scripts:[
+    var server = new EasyServer(common);
+    var develMode = common.getDevelMode();
+    var srcFunction = (s:{path:string, develPath?:string})=>
+        Path.posix.join(process.cwd(), develMode && s.develPath || s.path);
+    var mainHtml = await server.createMainHtml({title:'Aplicado', scripts:[
         ...server.scriptList(),
-        {path:'dist-client/client/fe-noticias.js'}
-    ]});
+    ], srcFunction});
     ipcMain.on('getTitulos', (event, _arg) => {
         var resultId = `result_${resultCounter++}`;
         event.returnValue = resultId;

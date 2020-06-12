@@ -15,7 +15,7 @@ import { TitulosData } from './common'
 enum Pantalla { principal, titulos }
 
 const IrAPantalla = (props:{pantalla:Pantalla, setPantalla:(destino:Pantalla)=>void, children:ReactChildren|string}) => 
-<Button color="secondary"
+<Button color="secondary" id={Pantalla[props.pantalla]}
     onClick={()=>props.setPantalla(props.pantalla)}
 >
     {props.children}
@@ -31,9 +31,9 @@ const Titulos = (props:{setPantalla:(destino:Pantalla)=>void}) => {
     },[])
     return <>
         <IrAPantalla pantalla={Pantalla.principal} setPantalla={props.setPantalla}> ⬅ </IrAPantalla>
-        <h1 id="filesTitle">títulos</h1>
+        <h1 id="title-list">títulos</h1>
         <ul>
-            {titulos.map((t, index) => <li key={t.title} id={`file${index}`}>
+            {titulos.map((t, index) => <li key={t.title} id={`title-${index}`}>
                 <b>{t.title}</b>
                 {t.date.toLocaleDateString()}
             </li>)}

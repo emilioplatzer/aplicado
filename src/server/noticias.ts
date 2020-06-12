@@ -6,9 +6,14 @@ import * as serveContent from "serve-content";
 
 import { promises as fs } from "fs";
 import * as Path from "path";
-import * as MiniTools from "mini-tools";
 
-import { APP_TITLE, EntryPoints, Commons, TitulosData } from "../client/common";
+import { Commons, TitulosData } from "../client/common";
+
+import * as JSON4all from "json4all";
+
+function throwError(message:string):never{
+    throw new Error(message);
+}
 
 function conclude(resolve:()=>void, reject:(err?:Error|undefined)=>void, message?:string){
     return function(err?:Error|undefined){
@@ -30,9 +35,6 @@ function quote(text:string){
         .replace(/>/g, '&gt;');
 }
 
-const BotonCerrar=`
-    <p><button id=closeButton>Click</button> to close the window and stop the server (and be patient).</p>`;
-
 
 interface ScriptForMainHtml {
     readonly path:string
@@ -41,18 +43,18 @@ interface ScriptForMainHtml {
 interface OptsCreateMainHtml {
     readonly title:string
     readonly scripts:ScriptForMainHtml[]
-    readonly scriptBasePath:string
+    readonly srcFunction:(pathInfo:{path:string}, i:number)=>string
 }
 
 export class EasyServer{
-    private SAFE_EXTS = ['','.html','js'];
+    private SAFE_EXTS = ['','html','js'];
     private app=express();
     private server?:Server;
-    private killed?:true;
+    private servedPaths:{[k:string]:{hostPath:string}} = {}
     constructor(private common:Commons){
+        console.log(this.common); // debe irse
     }
-    async createMainHtml(opts:OptsCreateMainHtml){
-        var develMode = this.common.getDevelMode();
+    async createMainHtml(opts:OptsCreateMainHtml){    
         return (
 `<!DOCTYPE html>
 <html>
@@ -69,7 +71,9 @@ export class EasyServer{
     <div id=main-div>
     </div>
     <div id=all-scripts>
-      ${opts.scripts.map(s=>`<script src="${Path.join(opts.scriptBasePath, develMode && s.develPath || s.path)}"></script>`).join(`
+      ${opts.scripts.map((s,i)=>
+        `<script src="${opts.srcFunction(s,i)}"></script>`
+      ).join(`
       `)}
     </div>
   </body>
@@ -81,59 +85,73 @@ export class EasyServer{
             {develPath:'node_modules/react-dom/umd/react-dom.development.js', path:'node_modules/react-dom/umd/react-dom.production.min.js'},
             {develPath:'node_modules/@material-ui/core/umd/material-ui.development.js', path:'node_modules/@material-ui/core/umd/material-ui.production.min.js'},
             {path:'node_modules/require-bro/lib/require-bro.js'},
+            {path:'node_modules/json4all/json4all.js'},
             {path:'dist-client/client/adapt.js'},
+            {path:'dist-client/client/fe-noticias.js'}
         ]
     }
-    listenEntryPoint(entryPoint:EntryPoints, core:(req:express.Request, res:express.Response)=>void, method:('get'|'post')='get'){
-        this.app[method](`/${this.common.entryPointsString(entryPoint)}`, (req,res)=>{
+    entryPointString(entryPoint:string){ return entryPoint };
+    listenEntryPoint(entryPoint:string, core:(req:express.Request, res:express.Response)=>void, method:('get'|'post')='get'){
+        this.app[method](`/${this.entryPointString(entryPoint)}`, (req,res)=>{
             res.contentType('html');
             core(req,res)
         });
     }
-    async createDinamicHtmlContent(entryPoint:EntryPoints, core:(pushContent:(part: string)=>void)=>Promise<void>){
-        this.listenEntryPoint(entryPoint, async (_req, res)=>{
-            res.write(`<head>
-                <title>${APP_TITLE}</title>
-                <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
-            </head>`);
-            res.write('<script src="require-bro/require-bro.js"></script>');
-            res.write('<script src="lib/common.js"></script>');
-            res.write('<script src="lib/common-instance.js"></script>');
-            res.write('<script src="lib/client.js"></script>');
-            var pushContent=(part:string)=>{
-                res.write(part);
+    addLibEntryPoint(opts:{hostPath:string, urlPath:string}):void
+    addLibEntryPoint(opts:{fileName:string}):void
+    addLibEntryPoint(opts:{fileName?:string, hostPath?:string, urlPath?:string}){
+        var dirName = opts.fileName && Path.dirname(opts.fileName);
+        var hostPath = opts.hostPath || opts.urlPath || dirName || throwError('addLibEntryPoint: lack of hostPath');
+        var urlPath = opts.urlPath || opts.hostPath || dirName || throwError('addLibEntryPoint: lack of urlPath');
+        if(this.servedPaths[urlPath]){
+            if(this.servedPaths[urlPath].hostPath != hostPath){
+                throw Error('addLibEntryPoint duplicate urlPath with different hostPath')
             }
-            await core(pushContent);
-            res.end();
-        })
+        }else{
+            this.app.use(urlPath, (req,res,next)=>{
+                return serveContent(Path.join(process.cwd(), hostPath), {allowedExts:this.SAFE_EXTS})(req,res,next);
+            });
+            this.servedPaths[urlPath]={hostPath};
+        }
     }
-    getBackButtonIfNeeded(){
-        return '<button id=back-arrow>⬅</button> '
+    async listenToServices(){
+        this.listenEntryPoint('ap2-getTitulos', async (req, res)=>{
+            try{
+                console.log('params', req.query)
+                var titulos = await this.getTitulos();
+                res.send(JSON4all.stringify({ok:titulos}));
+            }catch(err){
+                res.send(JSON4all.stringify({err:err.message, in:'getTitulos'}));
+            }
+        }, 'post');
     }
     async startListening():Promise<void>{
-        this.createDinamicHtmlContent(EntryPoints.menu, async (pushContent)=>{
-            pushContent(`
-                ${BotonCerrar}
-            `);
-        });
-        this.listenEntryPoint(EntryPoints.kill, (_req, res)=>{
-            console.log('recive kill')
-            res.send('killing...');
-            this.killed=true;
-        }, 'post');
+        var server = this;
+        var mainHtml = await server.createMainHtml({title:'Aplicado', scripts:[
+            ...server.scriptList(),
+            {path:'dist-client/client/noticias-proxy.js'}
+        ], srcFunction:(s:{path:string}, index:number)=>`/lib${index+1}/${Path.basename(s.path)}`});
+        var mainHtmlFileName = 'dist-client/client/index.html'
+        await fs.writeFile(mainHtmlFileName, mainHtml, 'utf8');
+        this.addLibEntryPoint({urlPath:'/', hostPath:'./dist-client/client/'});
+        /*
         this.app.get('/lib/common-instance.js',async (req,res)=>{
             var content = await fs.readFile('./dist-client/common-instance.js',{encoding:'utf8'});
             content = content.replace(/{\s*\/\*COMMON_DEVEL_MODE\*\/\s*}/,JSON.stringify(this.common.getDevelMode()));
             MiniTools.serveText(content,'javascript')(req,res);
         });
-        [
-            {urlPart:'/require-bro', serverPath:'./node_modules/require-bro/lib/'},
-            {urlPart:'/lib', serverPath:'./dist-client'}
-        ].forEach((module)=>{
-            this.app.use(module.urlPart, (req,res,next)=>{
-                return serveContent(module.serverPath, {allowedExts:this.SAFE_EXTS})(req,res,next);
-            });
+        */
+        var scriptList = [
+            ...this.scriptList(),
+            {path:'dist-client/client/noticias-proxy.js'}
+        ];
+        scriptList.forEach((module, index)=>{
+            if(module.develPath){
+                this.addLibEntryPoint({hostPath:Path.dirname(module.develPath), urlPath:`/lib${index+1}`});
+            }
+            this.addLibEntryPoint({hostPath:Path.dirname(module.path), urlPath:`/lib${index+1}`});
         })
+        await this.listenToServices();
         return new Promise((resolve, reject)=>{
             console.log('start to listen')
             this.server = this.app.listen(3303, conclude(resolve, reject, 'listening'));
@@ -155,17 +173,6 @@ export class EasyServer{
         }
         return result;
     }
-    async becomesKilled(){
-        return new Promise((resolve)=>{
-            const interval = setInterval(()=>{
-                if(this.killed){
-                    console.log('detect kill')
-                    clearInterval(interval);
-                    resolve()
-                }
-            },1000);
-        })
-    }
     async stopListening(){
         console.log('closing... (this may take a while)')
         return new Promise((resolve,reject)=>{
@@ -177,7 +184,7 @@ export class EasyServer{
     }
 }
 
-export async function start(opts?:{skipOpen?:true, listeningServer?:EasyServer, common?:Commons}){
+export async function start(opts?:{devel?:boolean, listeningServer?:EasyServer, common?:Commons}):Promise<EasyServer>{
     try{
         console.log('starting all');
         console.log('platform',process.platform);
@@ -189,12 +196,11 @@ export async function start(opts?:{skipOpen?:true, listeningServer?:EasyServer, 
         if(!(opts && opts.listeningServer)){
             await server.startListening();
         }
-        if(!opts || !opts.skipOpen){
-            open(`http://localhost:3303/${common.entryPointsString(EntryPoints.menu)}`);
+        if(opts && opts.devel){
+            await open(`http://localhost:3303/index.html`);
+            await new Promise(function(resolve,reject){ setTimeout(conclude(resolve,reject,'ready to close when there are no connections'),1000)});
         }
-        await server.becomesKilled();
-        await server.stopListening();
-        console.log('end of all')
+        return server;
     }catch(err){
         console.log('exit wit error')
         console.log(err);

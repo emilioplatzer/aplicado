@@ -10,6 +10,7 @@
         "@material-ui/core": "~4.10.0",
         "@material-ui/icons": "~4.9.1",
         "@material-ui/lab": "^4.0.0-alpha.54",
+        "json4all": "^0.3.10",
         "mini-tools": "^1.10.0",
         "require-bro": "~0.2.2",
         "serve-content": "~0.3.12"
@@ -34,6 +35,8 @@
         "prepare": "tsc -b src/client src/server src/test src/electron",
         "watch:prepare": "npm run prepare -- --watch",
         "watch:client": "tsc -p src/client --watch",
+        "watch:server": "tsc -p src/server --watch",
+        "watch:test": "tsc -p src/test --watch",
         "watch:electron": "tsc -p src/electron --watch",
         "build-start": "npm run prepare && npm start",
         "start": "node dist-server/server/server-noticias.js",

@@ -1,6 +1,4 @@
-import { EntryPoints } from "./common";
-
-import { common } from "./common-instance";
+// import { common } from "./common-instance";
 
 declare global{
     namespace NodeJS{
@@ -13,7 +11,7 @@ declare global{
     }
 }
 
-function isElectron() {
+export function isElectron() {
     // from https://github.com/cheton/is-electron/blob/master/index.js
     // Renderer process
     if (typeof window !== 'undefined' && typeof window.process === 'object' && window.process.type === 'renderer') {
@@ -34,14 +32,7 @@ function needsBackButton(){
     return isElectron();
 }
 
-
 window.addEventListener("load", function(){
-    var closeButton = document.getElementById('closeButton');
-    //prueba commit con repo cambiado
-    closeButton?.addEventListener("click", () => {
-        navigator.sendBeacon(`/${common.entryPointsString(EntryPoints.kill)}`, new Date().toString())
-        close();
-    });
     var backArrow = document.getElementById('back-arrow');
     if(backArrow!=null){
         if(needsBackButton()){
